@@ -260,5 +260,34 @@
 <p>Начать прослушивать Webhook.<br>
 <strong>Данный метод обязательно указывать в конце цепочки.</strong></p>
 <hr>
-<p>Danil Sidorenko © MIT 2018</p>
+<h3 id="public-cmdstring-command">public cmd(String $command)</h3>
+<p>Метод в котором необходимо обрабатывать все данные.<br>
+<strong>Обязательно указывать</strong> <code>return true;</code> <strong>после каждого условия.</strong></p>
+<pre><code>if( $command == "привет" ) {  
+  $this-&gt;sendMessage("Приветик")-&gt;addButton("А что ты умеешь?");  
+  return true;  
+}  
+
+return false;
+</code></pre>
+<hr>
+<h3 id="index.php">index.php</h3>
+<p>Файл для запуска чат бота.<br>
+Вы также можете изменить название файла, однако необходимо указывать то, что приведено к примеру ниже:</p>
+<pre><code>$main = new \yandex\alisa\Alisa();  
+$main-&gt;addStartMessage("Добро пожаловать")-&gt;setCaseSensitive(false)-&gt;listen();
+</code></pre>
+<h3 id="локальный-webhook">Локальный Webhook:</h3>
+<p>Чтобы запустить локальный webhook необходимо пройти на <a href="https://ngrok.com/">ngrko</a> и создать аккаунт.<br>
+После скачать программу и кинуть ее в удобно для вас место.<br>
+Запустите командную строку и пропишете:<br>
+ngrok http <code>port</code><br>
+Если это локальный сайт, то можете написать ngrok http <code>example.ru:port</code><br>
+В случае, если вы используете <a href="https://ospanel.io/">OpenServer</a> , то необходимо еще указать алису в настройках:<br>
+<img src="http://dl4.joxi.net/drive/2018/08/02/0024/0050/1622066/66/f83b666c74.png" alt="enter image description here"><br>
+При успешном запуске, просто введите этот адрес в Webhook URL:<br>
+<img src="http://dl4.joxi.net/drive/2018/08/02/0024/0050/1622066/66/b5e67d7a60.png" alt="enter image description here"></p>
+<hr>
+<p>Version: 1.0<br>
+Danil Sidorenko © MIT 2018</p>
 
