@@ -1,0 +1,19 @@
+{
+  "name": "Danil005/php-yandex-alisa",
+  "description": "PHP lib for alisa-bot",
+  "type": "project",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Danil Sidorenko",
+      "email": "danilsidorenko98@mail.ru"
+    }
+  ],
+  "minimum-stability": "alpha",
+  "autoload": {
+    "psr-4": {
+      "yandex\\alisa\\": "src/"
+    }
+  },
+  "require": {}
+}
