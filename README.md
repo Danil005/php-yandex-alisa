@@ -5,6 +5,26 @@
 
 <h1 id="php-yandex-alisa">PHP-YANDEX-ALISA</h1>
 <p>Библиотека для работы с Алисой.</p>
+<hr>
+<h2 id="содержание">Содержание</h2>
+<ol>
+<li>TODO</li>
+<li>Установка</li>
+<li>Описание констант</li>
+<li>Описание переменных</li>
+<li>Описание методов</li>
+<li>index.php</li>
+<li>Локальный Webhook.</li>
+</ol>
+<hr>
+<h2 id="todo">TODO</h2>
+<ul>
+<li>Теперь можно делать вариации вопросов и ответов. <strong>done</strong></li>
+<li>Выполнять payload-функции (callback). <strong>done</strong></li>
+<li>Реализация созданий навыков при помощи JSON-блоков.</li>
+<li>Отправка сообщений с фотографиями.</li>
+<li>Оплата при помощи компании Unitpay.</li>
+</ul>
 <h2 id="установка">Установка</h2>
 <pre><code>composer require danil005/php-yandex-alisa
 </code></pre>
