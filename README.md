@@ -21,6 +21,7 @@
 <ul>
 <li>Теперь можно делать вариации вопросов и ответов. <strong>done</strong></li>
 <li>Выполнять payload-функции (callback). <strong>done</strong></li>
+<li>Добавление проверку на орфографию. <strong>done</strong></li>
 <li>Реализация созданий навыков при помощи JSON-блоков.</li>
 <li>Отправка сообщений с фотографиями.</li>
 <li>Оплата при помощи компании Unitpay.</li>
@@ -52,6 +53,9 @@
 <hr>
 <h3 id="private-casesensitive--true">private $caseSensitive = true</h3>
 <p>Чувствительность к регистру сообщений.</p>
+<hr>
+<h3 id="private-speller--false">private $speller = false</h3>
+<p>Проверка на орфографию.</p>
 <hr>
 <h3 id="private-request--">private $request = []</h3>
 <p>Переменная, которая получает ответ от Алисы.</p>
@@ -121,6 +125,26 @@
 <td>String</td>
 <td>Версия Алиса API.</td>
 <td>Данные с константы VERSION</td>
+</tr>
+</tbody>
+</table><hr>
+<h3 id="public-setspellercorrectbool-speller--false-this">public setSpellerCorrect(bool $speller = false): $this</h3>
+
+<table>
+<thead>
+<tr>
+<th>Аргумент</th>
+<th>Тип</th>
+<th>Описание</th>
+<th>По умолчанию</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>speller</td>
+<td>bool</td>
+<td>Установить проверку на орфографию и ее исправления в случае нахождении ошибки.</td>
+<td>false</td>
 </tr>
 </tbody>
 </table><hr>
@@ -249,8 +273,9 @@
 </tr>
 </tbody>
 </table><hr>
-<h3 id="public-sendmessagestring-message-string-tts---this">public sendMessage(String $message, String $tts = “”): $this</h3>
-<p>Отправить сообщение пользователю.</p>
+<h3 id="public-sendmessagestring-message-string-tts---bool-speller--false--this">public sendMessage(String $message, String $tts = “”, bool $speller = false ): $this</h3>
+<p>Отправить сообщение пользователю.<br>
+Использовать speller в этом методе не так важно, ведь вы сами можете вводить корректный текст, однако если вы не уверены в написании или боитесь, что где-то сделали опечатку, то можете использовать этот аргумент и поставить его на <code>TRUE</code>.</p>
 
 <table>
 <thead>
@@ -273,6 +298,12 @@
 <td>String</td>
 <td>Синтез речи, ударения, паузы.</td>
 <td>“”</td>
+</tr>
+<tr>
+<td>speller</td>
+<td>bool</td>
+<td>Проверка на орфографию и исправление, если будет найдена ошибка.</td>
+<td>false</td>
 </tr>
 </tbody>
 </table><hr>
