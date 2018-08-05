@@ -276,6 +276,83 @@
 </tr>
 </tbody>
 </table><hr>
+<h3 id="protected-optionsquestionsarray-list-string-command-bool">protected optionsQuestions(Array $list, String $command): bool</h3>
+<p>Вариация реагирования на фразы для выполнения определенного дейсвтия указанного в<br>
+<a href="#public-cmdstring-command">cmd()</a>.</p>
+
+<table>
+<thead>
+<tr>
+<th>Аргумент</th>
+<th>Тип</th>
+<th>Описание</th>
+<th>По умолчанию</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>list</td>
+<td>Array</td>
+<td>Лист ключевых слов для вызова действия.</td>
+<td>Обязательно</td>
+</tr>
+<tr>
+<td>command</td>
+<td>String</td>
+<td>Команда пришедшая от пользователя на сервер.</td>
+<td>Обязательно</td>
+</tr>
+</tbody>
+</table><hr>
+<h3 id="protected-optionsanswersarray-list-mixed">protected optionsAnswers(Array $list): mixed</h3>
+<p>Отправить вариационный ответ пользователю. Например, если вы не хотите отправлять пользователю одно и тоже сообщение, то можно использовать этот метод и расширить диапазон речи.</p>
+
+<table>
+<thead>
+<tr>
+<th>Аргумент</th>
+<th>Тип</th>
+<th>Описание</th>
+<th>По умолчанию</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>list</td>
+<td>array</td>
+<td>Лист фраз, которые будет выдавать Алиса-навык.</td>
+<td>Обязательно</td>
+</tr>
+</tbody>
+</table><hr>
+<h3 id="protected-optionscallbackarray-list-array-callback-this">protected optionsCallback(Array $list, Array $callback): $this</h3>
+<p>Метод, который позволяет делать логическую операцию ИЛИ. В этом случае указывается набор<br>
+фраз, которые возможны при возврате payload (Callback). В случае если это слово будет найдено, то выдает <code>TRUE</code>. Также можно отправлять несколько Payload для одного действия и тем самым через эту функцию написать их оба.</p>
+
+<table>
+<thead>
+<tr>
+<th>Аргумент</th>
+<th>Тип</th>
+<th>Описание</th>
+<th>По умолчанию</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>list</td>
+<td>Array</td>
+<td>Лист ключевых слов.</td>
+<td>Обязательно</td>
+</tr>
+<tr>
+<td>callback</td>
+<td>String</td>
+<td>Обязательная переменная, которая передается в функцию для обработки.</td>
+<td>Обязательно</td>
+</tr>
+</tbody>
+</table><hr>
 <h3 id="public-listen-boolnull">public listen(): bool|null</h3>
 <p>Начать прослушивать Webhook.<br>
 <strong>Данный метод обязательно указывать в конце цепочки.</strong></p>
@@ -287,7 +364,29 @@
   $this-&gt;sendMessage("Приветик")-&gt;addButton("А что ты умеешь?");  
   return true;  
 }  
+//Или 
+if( $this-&gt;optionsQuestions(["привет", "здравствуйте"]) ) {  
+  $this
+  -&gt;sendMessage($this-&gt;optionsAnswers(["Добрый день!", "Я рада вас видеть!"]))
+  -&gt;addButton("А что ты умеешь?");  
+  return true;  
+}
 
+return false;
+</code></pre>
+<hr>
+<h3 id="public-payloadarray-callback">public payload(Array $callback)</h3>
+<p>Метод в котором необходимо обрабатывать все данные пришедших с payload…<br>
+<strong>Обязательно указывать</strong> <code>return true;</code> <strong>после каждого условия.</strong></p>
+<pre><code>if( array_key_exists('help', $callback) ) {  
+  $this-&gt;sendMessage('Много чего! А ты?');  
+  return true;  
+}  
+//Или
+if( $this-&gt;optionsCallback(["help", "helpme"], $callback) ) {  
+  $this-&gt;sendMessage('Много чего! А ты?');  
+  return true;  
+}  
 return false;
 </code></pre>
 <hr>
@@ -308,6 +407,6 @@ ngrok http <code>port</code><br>
 При успешном запуске, просто введите этот адрес в Webhook URL:<br>
 <img src="http://dl4.joxi.net/drive/2018/08/02/0024/0050/1622066/66/b5e67d7a60.png" alt="enter image description here"></p>
 <hr>
-<p>Version: 1.0<br>
+<p>Version: 1.1<br>
 Danil Sidorenko © MIT 2018</p>
 
