@@ -56,6 +56,12 @@ class Alisa extends Handler {
     private $caseSensitive = true;
 
     /**
+     * Проверка на орфографию.
+     * @var bool
+     */
+    private $speller = false;
+
+    /**
      * Переменная для получения ответа.
      * @var array
      */
@@ -79,6 +85,8 @@ class Alisa extends Handler {
                 $this->optionsAnswers(['Приветик', 'Здравствуйте, добрый день.'])
             )->addButton("А что ты умеешь?", false, [
                 'help'=>1
+            ])->addButton("А еще что?", false, [
+                'helpme'=>1
             ]);
             return true;
         }
@@ -92,11 +100,22 @@ class Alisa extends Handler {
      * @return bool
      */
     public function payload(Array $callback) {
-        if( array_key_exists('help', $callback) ) {
+        if( $this->optionsCallback(['help', 'helpme'], $callback) ) {
             $this->sendMessage('Много чего! А ты?');
             return true;
         }
         return false;
+    }
+
+    /**
+     * Установить проверку на орфографию.
+     * @param bool $speller
+     *
+     * @return $this
+     */
+    public function setSpellerCorrect(bool $speller = false) {
+        $this->speller = $speller;
+        return $this;
     }
 
     /**
@@ -202,13 +221,15 @@ class Alisa extends Handler {
      * Отправить сообщению пользователю.
      * @param String $message
      * @param String $tts
+     * @param bool $speller
      *
      * @return $this
      */
-    public function sendMessage(String $message, String $tts = "") {
+    public function sendMessage(String $message, String $tts = "", bool $speller = false) {
+        $msg = ( $speller == true ) ? $this->spellingCheck($message) : $message;
         $this->response = [
             'response' => [
-                'text' => $message,
+                'text' => $msg,
                 'tts'  => $tts,
                 'end_session' => false
             ]
@@ -259,6 +280,9 @@ class Alisa extends Handler {
         ) ) {
             $this->logger();
 
+            if( $this->speller == true ) {
+                $this->request['request']['command'] = $this->spellingCheck($this->request['request']['command']);
+            }
 
             if ( $this->request['request']['command'] == "" ) {
                 $this->response = [
