@@ -2,7 +2,10 @@
 
 namespace yandex\alisa;
 
-class Alisa {
+use yandex\alisa\Handler;
+
+class Alisa extends Handler {
+
 
     /**
      * Название навыка Алисы.
@@ -71,11 +74,28 @@ class Alisa {
      * @return bool
      */
     public function cmd(String $command) {
-        if( $command == "привет" ) {
-            $this->sendMessage("Приветик")->addButton("А что ты умеешь?");
+        if( $this->optionsQuestions(['привет', 'здравствуйте', 'добрый день'], $command) ) {
+            $this->sendMessage(
+                $this->optionsAnswers(['Приветик', 'Здравствуйте, добрый день.'])
+            )->addButton("А что ты умеешь?", false, [
+                'help'=>1
+            ]);
             return true;
         }
+        return false;
+    }
 
+    /**
+     * Выполнить дополнительные функции Payload.
+     * @param array $callback
+     *
+     * @return bool
+     */
+    public function payload(Array $callback) {
+        if( array_key_exists('help', $callback) ) {
+            $this->sendMessage('Много чего! А ты?');
+            return true;
+        }
         return false;
     }
 
@@ -196,15 +216,26 @@ class Alisa {
         return $this;
     }
 
+    public function send() {
+        return $this->response;
+    }
+
     /**
      * Запись пришедших данных в текстовый файл.
+     *
+     * @param String $data
      */
-    private function logger() {
-        if( !empty($this->request) ) {
+    private function logger(String $data = "") {
+        if (!empty($this->request)) {
+            if ($data == "") {
+                $s = $this->request;
+            } else {
+                $s = $data;
+            }
             file_put_contents(
                 'alisa_log.txt',
                 date('Y-m-d H:i:s') .
-                PHP_EOL . $this->request . PHP_EOL,
+                PHP_EOL . $s . PHP_EOL,
                 FILE_APPEND
             );
         }
@@ -227,6 +258,8 @@ class Alisa {
             $this->request['session']['user_id']
         ) ) {
             $this->logger();
+
+
             if ( $this->request['request']['command'] == "" ) {
                 $this->response = [
                     'response' => [
@@ -246,6 +279,24 @@ class Alisa {
                     $this->response['response']['text'] = $this->anyMessage;
                 };
             }
+
+            $this->response = array_merge($this->response,
+                [
+                    'session' => [
+                        'session_id' => $this->request['session']['session_id'],
+                        'message_id' => $this->request['session']['message_id'],
+                        'user_id' => $this->request['session']['user_id']
+                    ],
+                    'version' => "{$this->version}"
+                ]
+            );
+            echo json_encode($this->response);
+            return true;
+        } elseif( $this->request['request']['type'] == "ButtonPressed" ) {
+            $this->response = [];
+            if ( !$this->payload($this->request['request']['payload']) ) {
+                $this->response['response']['text'] = $this->anyMessage;
+            };
 
             $this->response = array_merge($this->response,
                 [
