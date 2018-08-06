@@ -90,6 +90,10 @@ class Alisa extends Handler {
             ]);
             return true;
         }
+        if( $this->prepare("забронируй мне {what} на {time} в {when}", $command) ) {
+            $this->sendMessage("Мы забронировали {$this->vars['what']} на {$this->vars['time']} в {$this->vars['when']}");
+            return true;
+        }
         return false;
     }
 

@@ -4,8 +4,42 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "b76e63dc7c1dbd7e36eb987e66057719",
-    "packages": [],
+    "content-hash": "c19e175a53d60f74b93a773f54d7b2d1",
+    "packages": [
+        {
+            "name": "qazd/text-diff",
+            "version": "v0.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/qazd/text-diff.git",
+                "reference": "a2679787c204b4fcb6a429a6787cf57deff0e3d0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/qazd/text-diff/zipball/a2679787c204b4fcb6a429a6787cf57deff0e3d0",
+                "reference": "a2679787c204b4fcb6a429a6787cf57deff0e3d0",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "src/TextDiff.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "authors": [
+                {
+                    "name": "Dmitry",
+                    "email": "qazd.dev@gmail.com"
+                }
+            ],
+            "description": "A simple text differences visualization library",
+            "time": "2016-12-08T12:25:53+00:00"
+        }
+    ],
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "alpha",

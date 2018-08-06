@@ -18,15 +18,58 @@
 </ol>
 <hr>
 <h2 id="todo">TODO</h2>
-<ul>
-<li>Теперь можно делать вариации вопросов и ответов. <strong>done</strong></li>
-<li>Выполнять payload-функции (callback). <strong>done</strong></li>
-<li>Добавление проверку на орфографию. <strong>done</strong></li>
-<li>Реализация созданий навыков при помощи JSON-блоков.</li>
-<li>Отправка сообщений с фотографиями.</li>
-<li>Оплата при помощи компании Unitpay.</li>
-</ul>
-<h2 id="установка">Установка</h2>
+
+<table>
+<thead>
+<tr>
+<th>Дата</th>
+<th>Описание релиза</th>
+<th>Состояние</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>5.08.2018</td>
+<td>Теперь можно делать вариации вопросов и ответов.</td>
+<td><strong>done</strong></td>
+</tr>
+<tr>
+<td>5.08.2018</td>
+<td>Выполнять payload-функции (callback).</td>
+<td><strong>done</strong></td>
+</tr>
+<tr>
+<td>5.08.2018</td>
+<td>Проверка на орфографию.</td>
+<td><strong>done</strong></td>
+</tr>
+<tr>
+<td>6.08.2018</td>
+<td>Поддержка подготовленных запросов.</td>
+<td><strong>done</strong></td>
+</tr>
+<tr>
+<td><center>—</center></td>
+<td>Реализация созданий навыков при помощи JSON-блоков.</td>
+<td><strong>in progges</strong></td>
+</tr>
+<tr>
+<td><center>—</center></td>
+<td>Отправка сообщений с фотографиями.</td>
+<td><strong>in plan</strong></td>
+</tr>
+<tr>
+<td><center>—</center></td>
+<td>Оплата при помощи компании Unitpay.</td>
+<td><strong>in plan</strong></td>
+</tr>
+<tr>
+<td><center>—</center></td>
+<td>Теперь можно делать вариации вопросов и ответов</td>
+<td><strong>in plan</strong></td>
+</tr>
+</tbody>
+</table><h2 id="установка">Установка</h2>
 <pre><code>composer require danil005/php-yandex-alisa
 </code></pre>
 <h2 id="описание-констант">Описание констант</h2>
@@ -56,6 +99,9 @@
 <hr>
 <h3 id="private-speller--false">private $speller = false</h3>
 <p>Проверка на орфографию.</p>
+<hr>
+<h3 id="public-vars--">public $vars = []</h3>
+<p>Переменная для обработки Prepare-функции.</p>
 <hr>
 <h3 id="private-request--">private $request = []</h3>
 <p>Переменная, которая получает ответ от Алисы.</p>
@@ -384,6 +430,41 @@
 </tr>
 </tbody>
 </table><hr>
+<h3 id="public-preparestring-getmessage-string-command-bool">public prepare(String $getMessage, String $command): bool</h3>
+<p>Метод, который позволяет делать подготовленные запросы и в последствии выводить их. Возвращает <code>true</code> или <code>false</code>, а также записывает результат функции в переменную <code>$this-&gt;vars</code>.</p>
+<p>Пример:</p>
+<pre><code>if( $this-&gt;prepare("Купить {what} за {price}", $command) ) {  
+  $this-&gt;sendMessage("Вы уверены, что хотите купить
+   {$this-&gt;vars['whats']} за {$this-&gt;vars['price']}₽?");  
+  return true;  
+}
+</code></pre>
+<p>Как вы можете заметить, ключи переменной vars отображают подготовленные ключи из аргумента <code>String $getMessage</code>.</p>
+
+<table>
+<thead>
+<tr>
+<th>Аргумент</th>
+<th>Тип</th>
+<th>Описание</th>
+<th>По умолчанию</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>getMessage</td>
+<td>String</td>
+<td>Сообщение, которое должен принять навык для обработки данных.</td>
+<td>Обязательно</td>
+</tr>
+<tr>
+<td>command</td>
+<td>String</td>
+<td>Сообщение которое придет от пользователя.</td>
+<td>Обязательно</td>
+</tr>
+</tbody>
+</table><hr>
 <h3 id="public-listen-boolnull">public listen(): bool|null</h3>
 <p>Начать прослушивать Webhook.<br>
 <strong>Данный метод обязательно указывать в конце цепочки.</strong></p>
@@ -400,6 +481,16 @@ if( $this-&gt;optionsQuestions(["привет", "здравствуйте"]) ) {
   $this
   -&gt;sendMessage($this-&gt;optionsAnswers(["Добрый день!", "Я рада вас видеть!"]))
   -&gt;addButton("А что ты умеешь?");  
+  return true;  
+}
+//Или 
+if( $this-&gt;prepare("забронируй мне {what} на {time} в {when}", $command) ) {  
+  $this-&gt;sendMessage
+  ("Мы забронировали 
+	  {$this-&gt;vars['what']}
+   на {$this-&gt;vars['time']}
+    в {$this-&gt;vars['when']}"
+  );  
   return true;  
 }
 
@@ -438,6 +529,253 @@ ngrok http <code>port</code><br>
 При успешном запуске, просто введите этот адрес в Webhook URL:<br>
 <img src="http://dl4.joxi.net/drive/2018/08/02/0024/0050/1622066/66/b5e67d7a60.png" alt="enter image description here"></p>
 <hr>
-<p>Version: 1.1<br>
+<p>Version: 1.2<br>
 Danil Sidorenko © MIT 2018</p>
 
+
+# PHP-YANDEX-ALISA
+Библиотека для работы с Алисой.
+___
+
+## Содержание
+1. [TODO](#todo)
+2. [Установка](#%D0%A3%D1%81%D1%82%D0%B0%D0%BD%D0%BE%D0%B2%D0%BA%D0%B0)
+3. [Описание констант](#%D0%9E%D0%BF%D0%B8%D1%81%D0%B0%D0%BD%D0%B8%D0%B5-%D0%BA%D0%BE%D0%BD%D1%81%D1%82%D0%B0%D0%BD%D1%82)
+4. [Описание переменных](#%D0%9E%D0%BF%D0%B8%D1%81%D0%B0%D0%BD%D0%B8%D0%B5-%D0%BF%D0%B5%D1%80%D0%B5%D0%BC%D0%B5%D0%BD%D0%BD%D1%8B%D1%85)
+5. [Описание методов](#%D0%9E%D0%BF%D0%B8%D1%81%D0%B0%D0%BD%D0%B8%D0%B5-%D0%BC%D0%B5%D1%82%D0%BE%D0%B4%D0%BE%D0%B2)
+6. [index.php](#indexphp)
+7. [Локальный Webhook.](#%D0%9B%D0%BE%D0%BA%D0%B0%D0%BB%D1%8C%D0%BD%D1%8B%D0%B9-webhook)
+
+___
+## TODO
+|Дата|Описание релиза|Состояние 
+|--|--|--|
+| 5.08.2018 |Теперь можно делать вариации вопросов и ответов.  |**done**
+| 5.08.2018 |Выполнять payload-функции (callback).  |**done**
+| 5.08.2018 |Проверка на орфографию.  |**done**
+| 6.08.2018 |Поддержка подготовленных запросов.  |**done**
+|<center>---</center>|Реализация созданий навыков при помощи JSON-блоков.   |**in progges**
+|<center>---</center>|Отправка сообщений с фотографиями.  |**in plan**
+|<center>---</center>|Оплата при помощи компании Unitpay. |**in plan**
+|<center>---</center>|Теперь можно делать вариации вопросов и ответов  |**in plan**
+
+## Установка
+  ``` 
+composer require danil005/php-yandex-alisa
+ ```
+## Описание констант
+### SKILL_NAME 
+Название навыка.
+___
+### VERSION
+Версия Алиса API. По умолчанию: 1.0
+## Описание переменных
+### private $startMessage = ""
+Сообщение, которое будет отображаться при старте навыка.
+___
+### private $startMessageTTS = ""
+Сообщение, которое будет озвучено синтезом речи Yandex.
+___
+### private $startButton = []
+Кнопки, которые будут отображены при запуске навыка
+___
+### private $version = self::VERSION
+Наследует константу VERSION.
+___
+### private $anyMessage  = "Простите, я вас не понимаю." 
+Сообщение, которое будет отправлено пользователю в случае, если команда не будет найдена.
+___
+### private $caseSensitive = true
+Чувствительность к регистру сообщений.
+___
+### private $speller = false
+Проверка на орфографию.
+___
+### public $vars = []
+Переменная для обработки Prepare-функции.
+___
+### private $request = []
+Переменная, которая получает ответ от Алисы.
+___
+### public $response = stdObject
+Переменная для формирования ответа на полученный запрос от Алисы.
+## Описание методов
+### public setCaseSensitive(bool $sensitive = true): $this
+Метод, который меняет чувствительность к регистру.
+`TRUE` - включить чувствительность.
+`FALSE` - выключить чувствительность.
+|Аргумент|Тип| Описание  |По умолчанию|
+|--|--|--|--|
+|sensitive|bool|Чувствительно к регистру.  |true 
+___
+### public setAny(String $message): $this
+Метод, который устанавливает сообщение по умолчанию, если чат-бот не смог понять, что от него хотят.
+|Аргумент|Тип| Описание  |По умолчанию|
+|--|--|--|--|
+|message|String|Текст сообщения.  |Обязательно 
+___
+### public setVersion(String $version = self::VERSION): $this
+Метод, который устанавливает версию Алиса API. 
+|Аргумент|Тип| Описание  |По умолчанию|
+|--|--|--|--|
+|version|String|Версия Алиса API.  |Данные с константы VERSION 
+___
+### public setSpellerCorrect(bool $speller = false): $this
+|Аргумент|Тип| Описание  |По умолчанию|
+|--|--|--|--|
+|speller|bool|Установить проверку на орфографию и ее исправления в случае нахождении ошибки.  |false
+___
+### public setEndMessage(): $this
+Метод, который завершает сессию и закрывает навык.
+___
+
+### public addStartMessage(String $message): $this
+Метод, который устанавливает сообщение при старте навыка.
+|Аргумент|Тип| Описание  |По умолчанию|
+|--|--|--|--|
+|message|String|Текст сообщения.  |Обязательно 
+___
+### public addStartTTS(String $message): $this
+Метод, который устанавливает сообщение при старте навыка для синтеза речи.
+|Аргумент|Тип| Описание  |По умолчанию|
+|--|--|--|--|
+|message|String|Текст сообщения.  |Обязательно 
+___
+### public addStartButton(String $title, bool $hide = false, Array $payload = [], String $url = null): $this
+Метод, который устанавливает кнопки при старте навыка.
+|Аргумент|Тип| Описание  |По умолчанию|
+|--|--|--|--|
+|title  |String|Название кнопки.  |Обязательно 
+|hide|bool|Спрятать кнопки после нажатия.|false
+|payload|Array|Отправить дополнительные данные для обработки.|[]
+|url|String|URL-ссылка|null
+___
+### public addButton(String $title, bool $hide = false, Array $payload = [], String $url = null): $this
+Метод, который устанавливает кнопки.
+
+
+**ВНИМАНИЕ!**
+**Обязательно перед этим методом использовать sendMessage();**
+|Аргумент|Тип| Описание  |По умолчанию|
+|--|--|--|--|
+|title  |String|Название кнопки.  |Обязательно 
+|hide|bool|Спрятать кнопки после нажатия.|false
+|payload|Array|Отправить дополнительные данные для обработки.|[]
+|url|String|URL-ссылка|null
+___
+### public sendMessage(String $message, String $tts = "", bool $speller = false ): $this
+Отправить сообщение пользователю. 
+Использовать speller в этом методе не так важно, ведь вы сами можете вводить корректный текст, однако если вы не уверены в написании или боитесь, что где-то сделали опечатку, то можете использовать этот аргумент и поставить его на `TRUE`.
+|Аргумент|Тип| Описание  |По умолчанию|
+|--|--|--|--|
+|message|String|Текст сообщения.  |Обязательно 
+|tts|String|Синтез речи, ударения, паузы.|""
+|speller|bool|Проверка на орфографию и исправление, если будет найдена ошибка.|false
+___
+### protected optionsQuestions(Array $list, String $command): bool
+Вариация реагирования на фразы для выполнения определенного дейсвтия указанного в 
+[cmd()](#public-cmdstring-command).
+|Аргумент|Тип| Описание  |По умолчанию|
+|--|--|--|--|
+|list|Array|Лист ключевых слов для вызова действия.  |Обязательно 
+|command|String|Команда пришедшая от пользователя на сервер.|Обязательно
+___
+### protected optionsAnswers(Array $list): mixed
+Отправить вариационный ответ пользователю. Например, если вы не хотите отправлять пользователю одно и тоже сообщение, то можно использовать этот метод и расширить диапазон речи.
+|Аргумент|Тип| Описание  |По умолчанию|
+|--|--|--|--|
+|list|array|Лист фраз, которые будет выдавать Алиса-навык.  |Обязательно 
+___
+### protected optionsCallback(Array $list, Array $callback): $this
+Метод, который позволяет делать логическую операцию ИЛИ. В этом случае указывается набор
+фраз, которые возможны при возврате payload (Callback). В случае если это слово будет найдено, то выдает `TRUE`. Также можно отправлять несколько Payload для одного действия и тем самым через эту функцию написать их оба.
+|Аргумент|Тип| Описание  |По умолчанию|
+|--|--|--|--|
+|list|Array|Лист ключевых слов.  |Обязательно 
+|callback|String|Обязательная переменная, которая передается в функцию для обработки.|Обязательно
+___
+### public prepare(String $getMessage, String $command): bool
+Метод, который позволяет делать подготовленные запросы и в последствии выводить их. Возвращает `true` или `false`, а также записывает результат функции в переменную `$this->vars`. 
+
+Пример:
+
+    if( $this->prepare("Купить {what} за {price}", $command) ) {  
+	  $this->sendMessage("Вы уверены, что хотите купить
+	   {$this->vars['whats']} за {$this->vars['price']}₽?");  
+	  return true;  
+	}
+
+Как вы можете заметить, ключи переменной vars отображают подготовленные ключи из аргумента `String $getMessage`.
+|Аргумент|Тип| Описание  |По умолчанию|
+|--|--|--|--|
+|getMessage|String|Сообщение, которое должен принять навык для обработки данных.  |Обязательно 
+|command|String|Сообщение которое придет от пользователя.|Обязательно
+___
+### public listen(): bool|null
+Начать прослушивать Webhook. 
+**Данный метод обязательно указывать в конце цепочки.**
+___
+### public cmd(String $command)
+Метод в котором необходимо обрабатывать все данные.
+**Обязательно указывать** `return true;` **после каждого условия.**
+
+    if( $command == "привет" ) {  
+	  $this->sendMessage("Приветик")->addButton("А что ты умеешь?");  
+	  return true;  
+	}  
+	//Или 
+	if( $this->optionsQuestions(["привет", "здравствуйте"]) ) {  
+	  $this
+	  ->sendMessage($this->optionsAnswers(["Добрый день!", "Я рада вас видеть!"]))
+	  ->addButton("А что ты умеешь?");  
+	  return true;  
+	}
+	//Или 
+	if( $this->prepare("забронируй мне {what} на {time} в {when}", $command) ) {  
+	  $this->sendMessage
+	  ("Мы забронировали 
+		  {$this->vars['what']}
+	   на {$this->vars['time']}
+	    в {$this->vars['when']}"
+	  );  
+	  return true;  
+	}
+  
+	return false;
+___
+### public payload(Array $callback)
+Метод в котором необходимо обрабатывать все данные пришедших с payload..
+**Обязательно указывать** `return true;` **после каждого условия.**
+
+    if( array_key_exists('help', $callback) ) {  
+	  $this->sendMessage('Много чего! А ты?');  
+	  return true;  
+	}  
+	//Или
+	if( $this->optionsCallback(["help", "helpme"], $callback) ) {  
+	  $this->sendMessage('Много чего! А ты?');  
+	  return true;  
+	}  
+	return false;
+___
+### index.php
+Файл для запуска чат бота.
+Вы также можете изменить название файла, однако необходимо указывать то, что приведено к примеру ниже:
+
+    $main = new \yandex\alisa\Alisa();  
+	$main->addStartMessage("Добро пожаловать")->setCaseSensitive(false)->listen();
+
+### Локальный Webhook: 
+Чтобы запустить локальный webhook необходимо пройти на [ngrko](https://ngrok.com/) и создать аккаунт.
+После скачать программу и кинуть ее в удобно для вас место.
+Запустите командную строку и пропишете: 
+ngrok http `port`
+Если это локальный сайт, то можете написать ngrok http `example.ru:port`
+В случае, если вы используете [OpenServer](https://ospanel.io/) , то необходимо еще указать алису в настройках:
+![enter image description here](http://dl4.joxi.net/drive/2018/08/02/0024/0050/1622066/66/f83b666c74.png)
+При успешном запуске, просто введите этот адрес в Webhook URL:
+![enter image description here](http://dl4.joxi.net/drive/2018/08/02/0024/0050/1622066/66/b5e67d7a60.png)
+
+___
+Version: 1.2
+Danil Sidorenko © MIT 2018

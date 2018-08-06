@@ -2,8 +2,15 @@
 
 namespace yandex\alisa;
 
+use stdClass;
+
 class handler {
 
+    /**
+     * Переменная для обработки Prepare-функции.
+     * @var array
+     */
+    public $vars = [];
 
     /**
      * Вариация вопросов.
@@ -43,6 +50,42 @@ class handler {
                 if( $options == $name ) return true;
             }
         }
+        return false;
+    }
+
+    /**
+     * Подготовленные запросы.
+     * @param String $getMessage
+     * @param String $command
+     *
+     * @return bool
+     */
+    public function prepare(String $getMessage, String $command) {
+        $var = []; $math = "";
+        $wordsCommand = explode(" ", $command);
+        $words = explode(" ", $getMessage);
+
+        $s = array_diff($wordsCommand, $words);
+        foreach ($words as $key => $value) {
+            if (strstr($value, '{') && strstr($value, '}')) {
+                $index = substr(strstr($value, '{'), 1,strpos($value, '}') - 1);
+                $var[$index] = $s[$key];
+                $words[$key] = ".*";
+            }
+        }
+        foreach ($words as $key=>$value) {
+            if( array_key_exists($key+1, $words) ) {
+                $math .= $value. " ";
+            } else {
+                $math .= $value;
+            }
+        }
+        $math = "/".$math."/";
+        if( preg_match($math, $command) ) {
+            $this->vars = $var;
+            return true;
+        }
+
         return false;
     }
 
