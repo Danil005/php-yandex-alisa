@@ -2,10 +2,12 @@
 
 namespace yandex\alisa;
 
-use yandex\alisa\Handler;
+
+use yandex\alisa\traits\SBlock;
 
 class Alisa extends Handler {
 
+	use SBlock;
 
     /**
      * Название навыка Алисы.
@@ -62,6 +64,12 @@ class Alisa extends Handler {
     private $speller = false;
 
     /**
+     * Система блоков.
+     * @var bool
+     */
+    private $blocks = false;
+
+    /**
      * Переменная для получения ответа.
      * @var array
      */
@@ -80,6 +88,10 @@ class Alisa extends Handler {
      * @return bool
      */
     public function cmd(String $command) {
+        if( $this->blocks == true ) {
+            return $this->executeBlockSystem($command);
+        }
+
         if( $this->optionsQuestions(['привет', 'здравствуйте', 'добрый день'], $command) ) {
             $this->sendMessage(
                 $this->optionsAnswers(['Приветик', 'Здравствуйте, добрый день.'])
@@ -90,10 +102,10 @@ class Alisa extends Handler {
             ]);
             return true;
         }
-        if( $this->prepare("забронируй мне {what} на {time} в {when}", $command) ) {
-            $this->sendMessage("Мы забронировали {$this->vars['what']} на {$this->vars['time']} в {$this->vars['when']}",
-                "Мы забронировали {$this->vars['what']} на {$this->vars['time']} в {$this->vars['when']}",
-                true);
+        if( $this->prepare("забронируй {what} на {time} в {when}", $command) || $command == "зб") {
+            $this->sendMessage(
+                $this->optionsAnswers(['Бронирую!', 'Бронь.'])
+            );
             return true;
         }
         return false;
@@ -106,11 +118,24 @@ class Alisa extends Handler {
      * @return bool
      */
     public function payload(Array $callback) {
+    	if( $this->blocks == true ) {
+    		return $this->executePayload($callback);
+	    }
         if( $this->optionsCallback(['help', 'helpme'], $callback) ) {
             $this->sendMessage('Много чего! А ты?');
             return true;
         }
         return false;
+    }
+
+    /**
+     * @param $on
+     *
+     * @return $this
+     */
+    public function setBlocksActions(bool $on = true) {
+        $this->blocks = $on;
+        return $this;
     }
 
     /**
@@ -242,11 +267,6 @@ class Alisa extends Handler {
         ];
         return $this;
     }
-
-    public function send() {
-        return $this->response;
-    }
-
     /**
      * Запись пришедших данных в текстовый файл.
      *
@@ -267,6 +287,34 @@ class Alisa extends Handler {
             );
         }
     }
+	protected function sendPayload(String $message, String $tts = "", array $button = []) {
+		$this->sendMessage($message, $tts)->addButton($button['title'], $button['hide'], $button['payload'], $button['url']);
+		unset($this->request['request']['payload']);
+    }
+
+
+	/**
+     * Вывести переменные.
+     * @param String $message
+     *
+     * @return mixed|String
+     */
+    public function printVars(String $message) {
+        $words = explode(" ", $message);
+        foreach ($words as $key => $value) {
+            if (strstr($value, '{') && strstr($value, '}')) {
+                $index = substr(strstr($value, '{'), 1,strpos($value, '}') - 1);
+                if( array_key_exists($index, $this->vars) ) {
+                    $message = str_replace("{" . $index . "}", $this->vars[$index], $message);
+                } else {
+                    die("[JSON_BLOCKS#3] Fatal Error: vars {".$index."} not found.");
+                }
+            }
+        }
+
+        return $message;
+    }
+
 
     /**
      * Прослушивать все запросы, которые приходят на сервер.

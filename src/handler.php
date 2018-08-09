@@ -1,16 +1,40 @@
 <?php
 
 namespace yandex\alisa;
+use League\Flysystem\Adapter\Local;
+use League\Flysystem\Filesystem;
 
-use stdClass;
+define('LAZER_DATA_PATH', realpath( __DIR__).'../../blocks');
 
-class handler {
+class Handler {
 
-    /**
+	/**
+	 * Файловая система.
+	 * @var \League\Flysystem\Filesystem
+	 */
+	public $files;
+
+	/**
      * Переменная для обработки Prepare-функции.
      * @var array
      */
     public $vars = [];
+
+
+	/**
+	 * Переменные отправленные на payload c текста.
+	 * @var array
+	 */
+    public $varsPayload = [];
+
+	/**
+	 * Handler constructor.
+	 */
+
+	public function __construct() {
+		$this->files = new Filesystem(new Local(__DIR__ .  "../../blocks"), ['visibility' => 'public']);
+	}
+
 
     /**
      * Вариация вопросов.
@@ -29,12 +53,18 @@ class handler {
     /**
      * Вариация ответов.
      * @param array $list
+     * @param int   $type
      *
-     * @return mixed
+     * @return mixed|int
      */
-    protected function optionsAnswers(Array $list) {
-        $randomMessage = $list[rand(0, count($list)-1)];
-        return $randomMessage;
+    protected function optionsAnswers(Array $list, int $type = 0) {
+    	if( $type == 0 ) {
+		    $randomMessage = $list[ rand( 0, count( $list ) - 1 ) ];
+
+		    return $randomMessage;
+	    } else {
+    		return rand( 0, count( $list ) - 1);
+	    }
     }
 
     /**
@@ -55,38 +85,72 @@ class handler {
 
     /**
      * Подготовленные запросы.
-     * @param String $getMessage
+     * @param        $getMessage
      * @param String $command
      *
      * @return bool
      */
-    public function prepare(String $getMessage, String $command) {
+    protected function prepare($getMessage, String $command) {
         $var = []; $math = "";
-        $wordsCommand = explode(" ", $command);
-        $words = explode(" ", $getMessage);
-
-        $s = array_diff($wordsCommand, $words);
-        foreach ($words as $key => $value) {
-            if (strstr($value, '{') && strstr($value, '}')) {
-                $index = substr(strstr($value, '{'), 1,strpos($value, '}') - 1);
-                $var[$index] = $s[$key];
-                $words[$key] = ".*";
+        if( !is_array($getMessage) ) {
+            $words = explode(" ", $getMessage);
+            $wordsCommand = explode(" ", $command);
+	
+	
+            $s = array_diff($wordsCommand, $words);
+	
+            foreach ($words as $key => $value) {
+                if (strstr($value, '{') && strstr($value, '}')) {
+                    $index = substr(strstr($value, '{'), 1,strpos($value, '}') - 1);
+                    $var[$index] = $s[$key];
+                    $words[$key] = ".*";
+                }
             }
-        }
-        foreach ($words as $key=>$value) {
-            if( array_key_exists($key+1, $words) ) {
-                $math .= $value. " ";
-            } else {
-                $math .= $value;
+            foreach ($words as $key=>$value) {
+                if( array_key_exists($key+1, $words) ) {
+                    $math .= $value. " ";
+                } else {
+                    $math .= $value. "";
+                }
             }
-        }
-        $math = "/".$math."/";
-        if( preg_match($math, $command) ) {
-            $this->vars = $var;
-            return true;
-        }
+            $math = "/".$math."/";
+            if( preg_match($math, $command) ) {
+                $this->vars = $var;
+                return true;
+            }
+        } else {
+        	foreach ($getMessage as $k=>$msg) {
+        		$math = "";
+		        $words = explode(" ", $msg);
+		        $wordsCommand = explode(" ", $command);
 
-        return false;
+
+		        $s = array_diff($wordsCommand, $words);
+
+		        foreach ($words as $key => $value) {
+			        if (strstr($value, '{') && strstr($value, '}')) {
+				        $index = substr(strstr($value, '{'), 1,strpos($value, '}') - 1);
+				        $var[$index] = $s[$key];
+				        $words[$key] = ".*";
+			        }
+		        }
+		        foreach ($words as $key=>$value) {
+			        if( array_key_exists($key+1, $words) ) {
+				        $math .= $value. " ";
+			        } else {
+				        $math .= $value. "";
+			        }
+		        }
+		        $math = "/".$math."/";
+		        if( preg_match($math, $command) ) {
+			        $this->vars = $var;
+			        return true;
+		        } else {
+		        	continue;
+		        }
+	        }
+        }
+	    return false;
     }
 
     /**
@@ -95,9 +159,10 @@ class handler {
      *
      * @return array|Object
      */
-    function objectToArray($d) {
+    protected function objectToArray($d) {
         return json_decode(json_encode(json_decode($d)), true);
     }
+
 
     /**
      * Проверка на орфографию и исправление.
@@ -105,7 +170,7 @@ class handler {
      *
      * @return mixed|String
      */
-    public function spellingCheck(String $message) {
+    protected function spellingCheck(String $message) {
         $ch = curl_init();
         $options = [
             CURLOPT_URL => "https://speller.yandex.net/services/spellservice.json/checkText",
@@ -126,5 +191,16 @@ class handler {
             $message = str_replace($word, $change, $message);
         }
         return $message;
+    }
+
+	/**
+	 * Файловая система.
+	 *
+	 * @param $path
+	 *
+	 * @return \League\Flysystem\Filesystem
+	 */
+    public function read($path) {
+    	return $this->files->read($path);
     }
 }

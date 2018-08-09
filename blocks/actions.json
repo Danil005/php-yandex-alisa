@@ -1,0 +1,67 @@
+[
+    {
+        "question": [
+            "купить",
+            "приобрести"
+        ],
+        "prepare": [
+            "купить {what}",
+            "приобрести {what}"
+        ],
+        "send": {
+            "message": {
+                "question": [
+                    "Производим покупку...",
+                    "Покупаем...",
+                    "Оплачиваем..."
+                ],
+                "prepare": [
+                    "Покупаем {what}...",
+                    "Приобретаем {what}..."
+                ]
+            },
+            "tts": {
+                "question": [
+                    "Произв+одим пок+упку...",
+                    "Покуп+аем...",
+                    "Опл+ачиваем..."
+                ],
+                "prepare": [
+                    "Покуп+аем {what}...",
+                    "Приобрет+аем {what}..."
+                ]
+            },
+            "buttons": {
+                "prepare": [
+                    {
+                        "title": "ButtonPrepare1",
+                        "hide": false,
+                        "payload": [
+                            {
+                                "function": "test",
+                                "vars": {
+                                    "admin": "yes",
+                                    "age": 23
+                                }
+                            }
+                        ],
+                        "url": null
+                    },
+                    {
+                        "title": "ButtonPrepare2",
+                        "hide": false,
+                        "payload": [],
+                        "url": "https://example.ru/"
+                    }
+                ],
+                "question": {
+                    "title": "ButtonQuestion1",
+                    "hide": true,
+                    "payload": [],
+                    "url": "https://example.ru/"
+                }
+            }
+        },
+        "end_session": false
+    }
+]

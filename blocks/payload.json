@@ -1,0 +1,27 @@
+{
+    "test": {
+        "sendMessage": {
+            "message": [
+                "Привет",
+                "Дарова"
+            ],
+            "tts": [
+                "Привет",
+                "Дарова"
+            ]
+        },
+        "sendButtons": [
+            {
+                "title": "Привет1",
+                "hide": false,
+                "payload": [
+                    {
+                        "function": "test2",
+                        "vars": {}
+                    }
+                ],
+                "url": null
+            }
+        ]
+    }
+}

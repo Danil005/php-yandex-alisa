@@ -1,4 +1,10 @@
 <?php include("vendor/autoload.php");
 
 $main = new \yandex\alisa\Alisa();
-$main->addStartMessage("Добро пожаловать")->setCaseSensitive(false)->setSpellerCorrect(true)->listen();
+$messageStart = "Добро пожаловать!";
+$main
+    ->addStartMessage($messageStart)
+    ->setCaseSensitive(false)
+    ->setBlocksActions(true)
+    ->setSpellerCorrect(true)
+    ->listen();
