@@ -9,7 +9,7 @@
       "email": "danilsidorenko98@mail.ru"
     }
   ],
-  "version": "1.2",
+  "version": "2.0",
   "minimum-stability": "alpha",
   "autoload": {
     "psr-4": {
