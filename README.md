@@ -1,4 +1,5 @@
 
+
 #  PHP-YANDEX-ALISA
 
 Библиотека для работы с Алисой.
@@ -31,7 +32,8 @@ ___
       + [Загрузить с сервера](#php-alisa-uploadfile-file_name)
       + [Загрузить с сайта](#php-alisa-uploadurl-url)
  9. [index.php](#indexphp)
- 10. [Локальный Webhook.](#%D0%9B%D0%BE%D0%BA%D0%B0%D0%BB%D1%8C%D0%BD%D1%8B%D0%B9-webhook)
+ 10. [setting.yml](#settingyml)
+ 11. [Локальный Webhook.](#%D0%9B%D0%BE%D0%BA%D0%B0%D0%BB%D1%8C%D0%BD%D1%8B%D0%B9-webhook)
 
 ___
 ## TODO
@@ -704,6 +706,20 @@ ___
 
     $main = new \yandex\alisa\Alisa();  
 	$main->addStartMessage("Добро пожаловать")->setCaseSensitive(false)->listen();
+	
+___
+## setting.yml
+Файл для настройки стандартных констант.
+
+    skill-name: АлиВиксед  
+	skill-id: 354e2695-98b3-4951-be30-e7e2efff5868  
+	skill-token: AQAAAAAW2RNZAAT7o0Uw9ECNE0WFgqvKcoGUppc
+
+|Константа|Описание|
+|--|--|
+|skill-name|Название навыка.
+|skill-id|ID-навыка.
+|skill-token|OAuth-токен Dialogs для работы с изображениями.
 
 ## Локальный Webhook: 
 Чтобы запустить локальный webhook необходимо пройти на [ngrko](https://ngrok.com/) и создать аккаунт.
