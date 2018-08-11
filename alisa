@@ -1,0 +1,44 @@
+#!/usr/bin/php
+<?php
+
+require_once ("vendor/autoload.php");
+
+use Lazer\Classes\Database as DB;
+
+$main = new yandex\alisa\Alisa();
+define('LAZER_DATA_PATH', realpath( __DIR__).'/database/');
+
+$last =  count(DB::table('images')->findAll())+1;
+
+if( strstr($argv[1], 'upload:file') ) {
+    $result = $main->uploadImage($argv[2]);
+    echo "\n\r===========\n\rSuccess Upload File";
+    echo "\n\rID: ".$result[$last]['id']."\n\r";
+    echo "ImageName: ".$result[$last]['image_name']."\n\r";
+	echo "ImageFile: ".$result[$last]['file_name']."\n\r";
+	echo "ImageID: ".$result[$last]['image_id']."\n\r===========\n\r";
+
+} elseif( strstr($argv[1], "upload:url") ) {
+	if( preg_match('/^((https|http)?:\/\/)?([\w\.]+)\.([a-z]{2,6}\.?)(\/[\w\.]*)*\/.*$/', $argv[2]) ) {
+	    $result = $main->uploadImage($argv[2]);
+    	echo "\n\r===========\n\rSuccess Upload File as Url";
+    	echo "\n\rID: ".$result[$last]['id']."\n\r";
+    	echo "ImageName: ".$result[$last]['image_name']."\n\r";
+    	echo "ImageFile: ".$result[$last]['file_name']."\n\r";
+    	echo "ImageID: ".$result[$last]['image_id']."\n\r===========\n\r";
+
+	} else {
+	    die("\n\r==============\n\rYou must use the link as you want to upload the image from other sources.\n\r==============\n\r");
+    }
+} elseif( strstr($argv[1], "upload:get") ) {
+    $images = DB::table('images')->findAll()->asArray();
+	echo "\n\r===========\n\rImages List";
+	foreach ($images as $key=>$val) {
+	    echo "\n\rID: ".$images[$key]['id']."\n\r";
+	    echo "ImageName: ".$images[$key]['image_name']."\n\r";
+	    echo "ImageFile: ".$images[$key]['file_name']."\n\r";
+	    echo "ImageID: ".$images[$key]['image_id']."\n\r===========\n\r\n\r";
+    }
+}
+
+?>

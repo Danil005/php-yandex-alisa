@@ -1,10 +1,13 @@
 <?php
 
 namespace yandex\alisa;
+
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
+use RomaricDrigon\MetaYaml\Loader\YamlLoader;
+use Lazer\Classes\Database as DB;
 
-define('LAZER_DATA_PATH', realpath( __DIR__).'../../blocks');
+define('LAZER_DATA_PATH', realpath( __DIR__).'/database/');
 
 class Handler {
 
@@ -13,6 +16,25 @@ class Handler {
 	 * @var \League\Flysystem\Filesystem
 	 */
 	public $files;
+
+
+	/**
+	 * ID-навыка.
+	 * @var string
+	 */
+	public $skillID = "";
+
+	/**
+	 * Название навыка.
+	 * @var string
+	 */
+	public $skillName = "";
+
+	/**
+	 * Токен авторизации навыка.
+	 * @var string
+	 */
+	public $token = "";
 
 	/**
      * Переменная для обработки Prepare-функции.
@@ -28,11 +50,22 @@ class Handler {
     public $varsPayload = [];
 
 	/**
+	 * Дириктория с изоброжениями.
+	 * @var string
+	 */
+	public $imagesDir = "images";
+
+	/**
 	 * Handler constructor.
 	 */
 
 	public function __construct() {
 		$this->files = new Filesystem(new Local(__DIR__ .  "../../blocks"), ['visibility' => 'public']);
+		$loader = new YamlLoader();
+		$setting = $loader->loadFromFile('settings.yml');
+		$this->token     = $setting['skill-token'];
+		$this->skillID   = $setting['skill-id'];
+		$this->skillName = $setting['skill-name'];
 	}
 
 
@@ -159,7 +192,7 @@ class Handler {
      *
      * @return array|Object
      */
-    protected function objectToArray($d) {
+    public function objectToArray($d) {
         return json_decode(json_encode(json_decode($d)), true);
     }
 
@@ -191,6 +224,60 @@ class Handler {
             $message = str_replace($word, $change, $message);
         }
         return $message;
+    }
+
+	/**
+	 * Загрузить изображение.
+	 * @param $path
+	 *
+	 * @return mixed
+	 */
+    public function uploadImage($path) {
+    	$id    = $this->curlImage($this->imagesDir . '/'.  $path)['image']['id'];
+    	$image = DB::table('images');
+    	$image->image_name = substr(md5($path), 0, 16);
+    	$image->image_id = $id;
+    	$image->file_name = pathinfo($path)['basename'];
+    	$image->save();
+    	return $image->find()->asArray();
+    }
+
+	/**
+	 * Curl запрос
+	 * @param string $path
+	 *
+	 * @return array|Object
+	 */
+    public function curlImage($path = "") {
+	    $ch      = curl_init();
+	    $options = [
+		    CURLOPT_URL            => "https://dialogs.yandex.net/api/v1/skills/".$this->skillID."/images",
+		    CURLOPT_POST           => FALSE,
+		    CURLOPT_HTTPHEADER         => [
+			    "Authorization: OAuth {$this->token}",
+		    ],
+		    CURLOPT_RETURNTRANSFER => true
+	    ];
+
+	    if( preg_match('/^((https|http)?:\/\/)?([\w\.]+)\.([a-z]{2,6}\.?)(\/[\w\.]*)*\/.*$/', $path) ) {
+		    $options[CURLOPT_POST] = true;
+		    $options[CURLOPT_POSTFIELDS] = [
+			    "url"=>$path
+		    ];
+	    } elseif( $path != "" ) {
+		    array_push($options, "Content-Type: multipart/form-data");
+		    $options[CURLOPT_POST] = true;
+		    $file = new \CURLFile(__DIR__ . '../../'.$path);
+		    $options[CURLOPT_POSTFIELDS] = ["file"=>$file];
+	    }
+
+	    curl_setopt_array( $ch, $options );
+	    $r = $this->objectToArray(curl_exec( $ch ));
+	    if ( curl_errno( $ch ) ) {
+		    echo curl_error( $ch ) . "\n";
+	    }
+	    curl_close( $ch );
+	    return $r;
     }
 
 	/**

@@ -1,0 +1,10 @@
+# Файл конфигурации
+#
+# skill-name  - название навыка
+# skill-id    - ID-навыка
+# skill-token - токен для авторизации.
+
+
+skill-name: АлиВиксед
+skill-id: 354e2695-98b3-4951-be30-e7e2efff5868
+skill-token: AQAAAAAW2RNZAAT7o0Uw9ECNE0WFgqvKcoGUppc

@@ -9,8 +9,8 @@
       "email": "danilsidorenko98@mail.ru"
     }
   ],
-  "version": "2.0",
-  "minimum-stability": "alpha",
+  "version": "2.1",
+  "minimum-stability": "dev",
   "autoload": {
     "psr-4": {
       "yandex\\alisa\\": "src/"
@@ -18,6 +18,9 @@
   },
   "require": {
     "php": ">=7.0",
-    "league/flysystem": "^1.0"
+    "league/flysystem": "^1.0",
+    "romaricdrigon/metayaml": "^1.1",
+    "greg0/lazer-database": "^1.1"
+
   }
 }

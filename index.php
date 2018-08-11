@@ -5,6 +5,6 @@ $messageStart = "Добро пожаловать!";
 $main
     ->addStartMessage($messageStart)
     ->setCaseSensitive(false)
-    ->setBlocksActions(true)
+    ->setBlocksActions(false)
     ->setSpellerCorrect(true)
     ->listen();

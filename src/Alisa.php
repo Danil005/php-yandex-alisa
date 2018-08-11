@@ -4,16 +4,12 @@ namespace yandex\alisa;
 
 
 use yandex\alisa\traits\SBlock;
+use Lazer\Classes\Database as DB;
+
 
 class Alisa extends Handler {
 
 	use SBlock;
-
-    /**
-     * Название навыка Алисы.
-     * @const String
-     */
-    const SKILL_NAME     = "АлиВиксед";
 
     /**
      * Версия Алисы по умолчанию.
@@ -69,6 +65,7 @@ class Alisa extends Handler {
      */
     private $blocks = false;
 
+
     /**
      * Переменная для получения ответа.
      * @var array
@@ -81,7 +78,7 @@ class Alisa extends Handler {
      */
     public $response;
 
-    /**
+	/**
      * Выполнять действия, которые указанны.
      * @param String $command
      *
@@ -91,22 +88,35 @@ class Alisa extends Handler {
         if( $this->blocks == true ) {
             return $this->executeBlockSystem($command);
         }
-
-        if( $this->optionsQuestions(['привет', 'здравствуйте', 'добрый день'], $command) ) {
-            $this->sendMessage(
-                $this->optionsAnswers(['Приветик', 'Здравствуйте, добрый день.'])
-            )->addButton("А что ты умеешь?", false, [
-                'help'=>1
-            ])->addButton("А еще что?", false, [
-                'helpme'=>1
-            ]);
-            return true;
-        }
-        if( $this->prepare("забронируй {what} на {time} в {when}", $command) || $command == "зб") {
-            $this->sendMessage(
-                $this->optionsAnswers(['Бронирую!', 'Бронь.'])
-            );
-            return true;
+        if( $command == "привет" ) {
+        	$this->sendGallery([
+        		[
+        			"file"=>'1.jpg',
+			        'title'=>'Текст',
+			        'desc'=>"Описание.",
+			        "options"=>[
+			        	'message'=>"Тест",
+			        	'payload'=>[
+			        		"function"=>1
+				        ]
+			        ]
+		        ],
+		        [
+			        "file"=>'2.jpg',
+			        'title'=>'Текст',
+			        'desc'=>"Описание.",
+			        "options"=>[
+				        'message'=>"Тест",
+				        'payload'=>[
+					        "function"=>1
+				        ]
+			        ]
+		        ]
+	        ], 'Тест', 'Привет', [
+	        	'payload'=>[
+	        		'function'=>"test"
+		        ]
+	        ]);
         }
         return false;
     }
@@ -121,10 +131,6 @@ class Alisa extends Handler {
     	if( $this->blocks == true ) {
     		return $this->executePayload($callback);
 	    }
-        if( $this->optionsCallback(['help', 'helpme'], $callback) ) {
-            $this->sendMessage('Много чего! А ты?');
-            return true;
-        }
         return false;
     }
 
@@ -136,6 +142,17 @@ class Alisa extends Handler {
     public function setBlocksActions(bool $on = true) {
         $this->blocks = $on;
         return $this;
+    }
+
+	/**
+	 * Установить директорию изображений.
+	 * @param String $path
+	 *
+	 * @return $this
+	 */
+    public function setImagesDir(String $path) {
+    	$this->imagesDir = $path;
+    	return $this;
     }
 
     /**
@@ -267,6 +284,84 @@ class Alisa extends Handler {
         ];
         return $this;
     }
+
+	/**
+	 * Отправить галерею.
+	 * @param array  $images
+	 * @param String $headerText
+	 * @param String $footerText
+	 * @param array  $footerOpt
+	 *
+	 * @return $this
+	 */
+    public function sendGallery(Array $images, String $headerText = "", String $footerText = "", Array $footerOpt = []) {
+    	$img = DB::table('images')->findAll()->asArray();
+    	$items = [];
+	    $this->response['response']['card'] = [
+		    "type" => "ItemsList"
+	    ];
+
+	    if( $headerText != "" ) {
+	    	$this->response['response']['card']['header'] = ["text"=>$headerText];
+	    }
+    	foreach ($img as $image) {
+    		foreach ($images as $k=>$value) {
+				if ( $image['image_name'] == substr( md5( $value['file'] ), 0, 16 ) ) {
+					$i[$k] = [
+						"image_id"    => $image['image_id'],
+						"title"       => $value['title'],
+						"description" => $value['desc'],
+					];
+					if( $value['options']['url'] != "" ) {
+						$i[$k]["button"]['url'] = $value['options']['url'];
+					}
+					if( $value['options']['payload'] != "" ) {
+						$i[$k]["button"]['payload'] = $value['options']['payload'];
+					}
+					if( $value['options']['message'] != "" ) {
+						$i[$k]["button"]['text'] = $value['options']['message'];
+					}
+					$items['items'] = $i;
+				    $paths[]          = substr( md5( $value['file'] ), 0, 16 );
+				}
+		    }
+	    }
+
+	    $this->response['response']['card'] = array_merge($this->response['response']['card'], $items);
+    	if( $footerText != "" ) $this->response['response']['card']['footer'] = ["text"=>$footerText];
+    	if( $footerOpt != [] ) $this->response['response']['card']['footer'] = ["button"=>["url"=>$footerOpt['url'], "payload"=>$footerOpt['payload']]];
+    	return $this;
+    }
+
+	/**
+	 * Отправить изображение.
+	 * @param         $path
+	 * @param string  $title
+	 * @param string  $description
+	 * @param array   $options
+	 *
+	 * @return $this
+	 */
+    public function sendImage($path, String $title = "", String $description = "", Array $options = []) {
+    	$img = DB::table('images')->findAll()->asArray();
+    	foreach ($img as $key=>$value) {
+    		if( $value['image_name'] == substr(md5($path), 0, 16) ) {
+			    $this->response['response']['card'] =[
+				    "type"        => "BigImage",
+				    "image_id"    => $value['image_id'],
+				    "title"       => $title,
+				    "description" => $description
+			    ];
+			    if( $options != [] ) {
+			    	$this->response['response']['card']['button'] = ['url'=>$options['url'], 'payload'=>$options['payload']];
+			    }
+    			return $this;
+		    }
+	    }
+	    $mPath = substr(md5($path), 0, 16);
+	    die("[ALISA]: Image \"{$mPath}\" not found. [Original: {$path}]");
+    }
+
     /**
      * Запись пришедших данных в текстовый файл.
      *
