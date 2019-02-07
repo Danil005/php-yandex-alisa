@@ -49,7 +49,7 @@ ___
 
 ## Установка
   ``` 
-composer require danil005/php-yandex-alisa
+composer require danil005/php-yandex-alisa:dev-master
  ```
 ## Описание констант
 ### SKILL_NAME 
